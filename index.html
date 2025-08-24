@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sid Karwal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Helvetica+Neue:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            line-height: 1.5;
+            color: #000000;
+            background: #ffffff;
+            font-size: 16px;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 80px 0 60px;
+            border-bottom: 1px solid #cccccc;
+            margin-bottom: 80px;
+        }
+
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 30px;
+            border: 1px solid #cccccc;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            line-height: 1.1;
+            color: #000000;
+        }
+
+        .intro {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            margin-bottom: 40px;
+            color: #333333;
+            font-weight: 400;
+        }
+
+        .intro p {
+            margin-bottom: 24px;
+        }
+
+        .intro p:last-child {
+            margin-bottom: 0;
+        }
+
+        .section {
+            margin-bottom: 100px;
+        }
+
+        .section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 60px;
+            font-weight: 700;
+            color: #000000;
+        }
+
+        .project {
+            margin-bottom: 80px;
+            padding-bottom: 60px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .project:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .project-header {
+            margin-bottom: 15px;
+        }
+
+        .project h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 8px;
+        }
+
+        .project-type {
+            font-size: 0.9rem;
+            color: #666666;
+            font-style: normal;
+            margin-bottom: 24px;
+            font-weight: 400;
+        }
+
+        .project-description {
+            font-size: 1.05rem;
+            color: #333333;
+            margin-bottom: 24px;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .project-description p {
+            margin-bottom: 16px;
+        }
+
+        .project-description p:last-child {
+            margin-bottom: 0;
+        }
+
+        .project-link {
+            color: #000000;
+            text-decoration: underline;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-underline-offset: 4px;
+            text-decoration-thickness: 2px;
+        }
+
+        .project-link:hover {
+            color: #666666;
+        }
+
+        .project-link::before {
+            content: "";
+        }
+
+        .contact-section {
+            border-top: 1px solid #cccccc;
+            padding: 60px 0 40px;
+            color: #333333;
+        }
+
+        .contact-section h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 8px;
+        }
+
+        .contact-section p {
+            margin-bottom: 16px;
+            color: #333333;
+        }
+
+        .contact-link {
+            color: #000000;
+            text-decoration: underline;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            text-underline-offset: 4px;
+            text-decoration-thickness: 2px;
+        }
+
+        .contact-link:hover {
+            color: #666666;
+        }
+
+        .copyright {
+            color: #666666;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        footer {
+            padding: 30px 0;
+            color: #666666;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            header {
+                padding: 40px 0 30px;
+                margin-bottom: 40px;
+            }
+
+            .profile-image {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 25px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .intro {
+                font-size: 1rem;
+            }
+
+            .section {
+                margin-bottom: 60px;
+            }
+
+            .section h2 {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+            }
+
+            .project {
+                margin-bottom: 40px;
+                padding-bottom: 30px;
+            }
+
+            .project h3 {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .intro {
+                font-size: 0.95rem;
+            }
+
+            .project-description {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="sidkarwal.jpg" alt="Sid Karwal" class="profile-image">
+            <h1>Sid Karwal</h1>
+            <div class="intro">
+                <p>I've been designing, coding, and building things online since I was 10. Built a design studio, ran e-commerce ops, launched boutique hotels, advised political campaigns, and built a news media company — then walked away from all of them.</p>
+
+                <p>I now study philosophy, theology, finance, and psychology. Interview monks, mystics, shamans and witches for a podcast that is still finding its name.</p>
+
+                <p>Currently building with universities and tech companies — usually at the edge, sometimes over it.</p>
+            </div>
+        </header>
+
+        <main>
+            <section class="section">
+                <h2>Recent Work</h2>
+
+                <div class="project">
+                    <div class="project-header">
+                        <h3>Evolution of Breath</h3>
+                        <div class="project-type">Strategy + Brand + Development</div>
+                    </div>
+                    <div class="project-description">
+                        <p>Mike teaches people how to breathe. Not the kind you do to stay alive, but the kind that changes you. Ancient shamanic techniques mixed with modern therapy.</p>
+
+                        <p>I built the strategy, brand, and platform for his breathwork certification program. We created something that bridges 5,000-year-old practices with contemporary healing—training facilitators who hold space for real transformation, not just wellness theater.</p>
+                    </div>
+                    <a href="https://evolutionofbreath.com/" class="project-link" target="_blank" rel="noopener noreferrer">Visit Website</a>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <h3>University of British Columbia, Vancouver</h3>
+                        <div class="project-type">Strategy + Digital + Operations</div>
+                    </div>
+                    <div class="project-description">
+                        <p>UBC wanted to crack South Asia for student recruitment. Not just India—the entire region from Pakistan to Indonesia.</p>
+
+                        <p>I'm building their expansion strategy, leading brand amplification, and solving operational problems they didn't know they had. We're launching everything from high school competitions to end-to-end student journey optimization.</p>
+
+                        <p>Turns out scaling education across 15 countries isn't just about translation—it's about understanding that a student in New Delhi has different dreams than one in Jakarta.</p>
+                    </div>
+                    <a href="https://ubc.ca" class="project-link" target="_blank" rel="noopener noreferrer">Explore UBC</a>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <h3>Buuuk</h3>
+                        <div class="project-type">Marketing + Operations + Content</div>
+                    </div>
+                    <div class="project-description">
+                        <p>A Singapore digital agency that builds apps for enterprises and governments. For 5 years, I've been their marketing brain—running automation systems, designing campaigns, writing case studies that actually convert prospects into clients.</p>
+
+                        <p>I turn their technical wins into stories that make sense to people who sign checks. Consistent growth in a market where most agencies struggle to explain why they're different.</p>
+                    </div>
+                    <a href="https://buuuk.com" class="project-link" target="_blank" rel="noopener noreferrer">Visit Website</a>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <h3>Life Noggin</h3>
+                        <div class="project-type">YouTube Strategy + Engagement</div>
+                    </div>
+                    <div class="project-description">
+                        <p>An educational YouTube channel that breaks down science, space, and human body topics through animated videos. 3.2 million subscribers who watch 3-5 minute episodes about why humans do weird things.</p>
+
+                        <p>I helped them solve the problem every creator faces—people watch, but don't come back. Turned out their content was solid, but their relationship with viewers was one-sided. Fixed that.</p>
+                    </div>
+                    <a href="https://www.youtube.com/@lifenoggin" class="project-link" target="_blank" rel="noopener noreferrer">Visit Life Noggin Youtube</a>
+                </div>
+            </section>
+
+            <section class="contact-section">
+                <h3>Get in touch</h3>
+                <p>For projects that matter.</p>
+                <a href="https://calendly.com/sidkarwal/call" class="contact-link" target="_blank" rel="noopener noreferrer">Schedule a call</a>
+            </section>
+        </main>
+
+        <footer>
+            <div class="container">
+                <div class="copyright">
+                    <p>© 2025 Sid Karwal. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
