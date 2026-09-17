@@ -1,0 +1,6 @@
+<!-- Parkstone icon only, extracted from assets/logos/parkstone.svg (the full 231x36
+     lockup) on 2026-08-01 at Sid's request: keep the mark, drop the wordmark.
+     Single path, brand blue #0248F6. The wordmark paths were #3B3B33. -->
+<svg width="45" height="56" viewBox="0 0 29 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M21.9717 0.0595703H0V24.5662L14.8048 11.3219H6.56646L10.8151 7.08873H22.0089V18.2453L17.7947 22.4455V14.3018L0 30.474V35.9397H10.0549V28.2641H21.9869L28.9941 21.2788V7.05853L21.9717 0.0595703Z" fill="#0248F6"/>
+</svg>

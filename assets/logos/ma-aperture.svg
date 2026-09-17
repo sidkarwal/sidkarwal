@@ -1,0 +1,12 @@
+<!-- Mark for the (deliberately unnamed) M&A deal sourcing row. Sid picked this on
+     2026-08-01 from four solid-form options, after rejecting six diagram-style ones.
+     Four corner brackets closing on a target: a finder. Drawn in the page idiom,
+     one solid fill, no strokes, no gradients, clay #CC5B3E, square 64x64 so it
+     renders 56x56 in the .logo slot and survives the 62px mobile column. -->
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0 H28 V10 H10 V28 H0Z" fill="#CC5B3E"/>
+  <path d="M64 0 V28 H54 V10 H36 V0Z" fill="#CC5B3E"/>
+  <path d="M0 64 V36 H10 V54 H28 V64Z" fill="#CC5B3E"/>
+  <path d="M64 64 H36 V54 H54 V36 H64Z" fill="#CC5B3E"/>
+  <rect x="25" y="25" width="14" height="14" fill="#CC5B3E"/>
+</svg>

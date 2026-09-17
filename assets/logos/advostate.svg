@@ -1,0 +1,11 @@
+<!-- Advostate mark. Sid co-founded the company (2017-2020, election campaign
+     management, Northern India) and asked for a new mark on 2026-08-01, after a
+     full-disk + Spotlight + web search found no trace of the original.
+     Chosen from four options: an A knocked out of a solid block, referencing the
+     rubber stamp that marks an Indian ballot. evenodd fill: square, minus the A,
+     plus the A's counter.
+     Colour is #16233A, the dark navy band of the site's locked Casey palette, NOT
+     an invented hue. Sid asked for "dark tech blue". -->
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0 H64 V64 H0Z M32 12 L50 52 H40.5 L37.6 44 H26.4 L23.5 52 H14 Z M32 27 L29.2 35.5 H34.8 Z" fill="#16233A" fill-rule="evenodd"/>
+</svg>

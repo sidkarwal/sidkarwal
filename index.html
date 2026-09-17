@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sid Karwal</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0A'/%3E%3Crect x='4' y='6' width='7' height='20' fill='%2316233A'/%3E%3Crect x='12' y='6' width='7' height='20' fill='%233E8F5C'/%3E%3Crect x='20' y='6' width='4' height='20' fill='%234FC8F0'/%3E%3Crect x='25' y='6' width='3' height='20' fill='%23EDE9A8'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sid Karwal">
+<meta property="og:title" content="I&rsquo;m a builder">
+<meta property="og:description" content="AI agents, web and mobile apps, growth engines, brand systems, video podcasts, immersive experiences, bonsai.">
+<meta property="og:image" content="https://sidkarwal.com/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://sidkarwal.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="I&rsquo;m a builder">
+<meta name="twitter:description" content="AI agents, web and mobile apps, growth engines, brand systems, video podcasts, immersive experiences, bonsai.">
+<meta name="twitter:image" content="https://sidkarwal.com/assets/og.jpg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="description" content="I’m a builder. AI agents, web and mobile apps, growth engines, brand systems, video podcasts, immersive experiences, bonsai.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A; --fg:#F4EFE5;
+  --dim:rgba(244,239,229,.56); --faint:rgba(244,239,229,.13);
+  --clay:#CC5B3E;
+  --clay-ink:#B5462E;
+  --paper:#FFFFFF; --ink:#0A0A0A; --soft:#5A5247;
+  --line:rgba(10,10,10,.13); --line2:rgba(10,10,10,.22);
+  --display:'JetBrains Mono', monospace;
+  /* the gutter is fluid, not a flat 40px. At 1440 and 1512 (the two commonest
+     MacBooks) a 40px gutter put the content at ~94.5% of the viewport, effectively
+     edge to edge, while a 16" hit the 1560 cap and sat at 85.6%. The site changed
+     character depending on which Mac you opened it on. This holds ~90-91% on 13-14"
+     and lets the container cap take over above that. */
+  --gut:clamp(40px,4.6vw,68px);
+  --w:1560px;
+  --pad:max(var(--gut),calc((100vw - 1560px) / 2 + var(--gut)));
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--fg);font-family:'Space Grotesk',sans-serif;font-size:17px;line-height:1.5;overflow-x:hidden}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 var(--gut)}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--clay);color:var(--fg)}
+
+/* ============ CANVAS BACKGROUND ============ */
+/* fixed full viewport, sits under everything. low-res cell buffer only, never per-pixel. */
+#raster{position:fixed;inset:0;width:100vw;height:100svh;display:block;z-index:0}
+.scanlines{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(to right,rgba(0,0,0,.07) 0px,rgba(0,0,0,.07) 1px,transparent 1px,transparent 3px);
+  mix-blend-mode:overlay;opacity:.55}
+.veil{position:fixed;inset:0;z-index:2;pointer-events:none;background:
+  radial-gradient(130% 100% at 50% 40%,rgba(0,0,0,0) 0%,rgba(0,0,0,.26) 60%,rgba(0,0,0,.7) 100%),
+  linear-gradient(to top,var(--bg) 0%,rgba(10,10,10,.86) 12%,rgba(10,10,10,.44) 34%,rgba(10,10,10,0) 66%)}
+.grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.16;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ============ TOP BAR ============ */
+/* fixed, and on the same .wrap grid as the hero so the mark sits on the
+   headline's left edge. above the veil and grain. */
+.topbar{position:absolute;top:0;left:0;right:0;z-index:5000}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding-top:26px;padding-bottom:26px}
+.topbar .mark{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--fg)}
+.acts{display:flex;gap:10px}
+.btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--faint);padding:12px 18px;white-space:nowrap;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  transition:background .25s ease,color .25s ease,border-color .25s ease}
+.btn:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.solid{background:var(--clay);border-color:var(--clay)}
+.btn.solid:hover{background:var(--fg);color:var(--bg)}
+
+@media(max-width:620px){
+  .topbar .wrap{padding-top:18px;padding-bottom:18px;gap:12px}
+  .topbar .mark{font-size:10.5px;letter-spacing:.12em}
+  .btn{font-size:9.5px;padding:10px 12px;letter-spacing:.08em}
+  .acts{gap:7px}
+}
+
+/* ============ HERO ============ */
+.hero{position:relative;height:100svh;min-height:600px;display:flex;flex-direction:column;justify-content:flex-end;z-index:4}
+/* this bottom padding originally reserved room for the tooltips on the list, which
+   opened downward. The tooltips were dropped 2026-08-01 (Sid: "it is very clear what
+   they mean"), so the value is now just the hero's breathing room and can be reduced
+   freely if the fold ever needs to be tighter. */
+.hero .inner{position:relative;padding-bottom:clamp(58px,8.5vh,96px)}
+/* sized directly rather than fitted to the column, so the headline does not grow
+   just because the copy got shorter. fitH1() only guards overflow.
+   10.4vw is the size Sid approved and it is held across the typeface change.
+   mono is much wider per character than Bebas, so at the same size the line now
+   runs close to the full column. tracking goes negative because monospace
+   advance widths are generous at display size. */
+h1{font-family:var(--display);font-size:clamp(18px,10.4vw,200px);font-weight:700;line-height:1;letter-spacing:-.02em;text-transform:uppercase;white-space:nowrap}
+.hero .list{font-family:'JetBrains Mono',monospace;font-size:clamp(11.5px,1.28vw,15px);letter-spacing:.02em;line-height:1.85;color:var(--fg);margin-top:26px;padding-top:20px;border-top:1px solid var(--faint)}
+@media(min-width:821px){.hero .list{white-space:nowrap}}
+
+
+/* reveal animation, played once on load */
+.rv{opacity:0;transform:translateY(24px)}
+.go .rv{opacity:1;transform:none;transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.go .rv.d3{transition-delay:.36s}
+.mask{display:block;overflow:hidden}
+.mask i{display:block;font-style:normal;transform:translateY(102%)}
+.go .mask i{transform:none;transition:transform 1.05s cubic-bezier(.16,1,.3,1);transition-delay:.16s}
+
+/* ============ CLOSE ============ */
+/* transparent on purpose: the white sheet ends and the field comes back, which
+   is the page's whole temperature curve resolving. */
+.close{position:relative;z-index:4;color:var(--fg);
+  padding:clamp(90px,16vh,180px) 0 clamp(60px,9vh,110px)}
+.close .line{font-family:var(--display);font-weight:700;
+  font-size:clamp(26px,4.15vw,60px);line-height:1.06;letter-spacing:-.035em;
+  text-transform:uppercase;max-width:22ch}
+/* the question is a block so the line ALWAYS breaks at the full stop. left to wrap
+   naturally it broke as "I LIKE TO BUILD. WHAT / HAVE YOU GOT?", splitting the
+   question across two lines at some widths and not others. */
+.close .line em{display:block;font-style:normal;color:var(--clay)}
+/* the page's only CTA below the fold: the top bar is position:absolute and scrolls
+   away with the hero, so without this a reader who gets all the way down has nothing
+   to act on.
+   NOT a button. Sid cut the solid clay slab 2026-08-01: it was the only UI widget on
+   a page built entirely from type and rules, and it stacked a second clay object
+   directly under the clay "got?". This is display type at the statement's own weight,
+   with the arrow carrying the accent instead of a filled rectangle. */
+.close .cta{display:inline-block;margin-top:clamp(26px,4vh,42px);
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(15px,1.7vw,24px);line-height:1.06;letter-spacing:-.01em;
+  text-transform:uppercase;color:var(--fg);transition:color .25s ease}
+.close .cta .ar{color:var(--clay);display:inline-block;transition:transform .25s ease}
+.close .cta:hover{color:var(--clay)}
+.close .cta:hover .ar{transform:translateX(6px)}
+@media(max-width:620px){.close .line{font-size:clamp(24px,7.4vw,40px);max-width:none}
+  .close .cta{font-size:clamp(14px,4.6vw,19px)}}
+
+/* ============ WORK (a white sheet over the field) ============ */
+/* .work itself paints nothing. every block inside carries its own white, so a
+   closed row can drop its background on hover and become a window onto the
+   live raster running behind the whole page. that is the section's one idea. */
+.work{position:relative;z-index:4;background:transparent;color:var(--ink)}
+.sheet{background:var(--paper)}
+.sheet.top{padding-top:clamp(70px,11vh,120px);padding-bottom:clamp(30px,5vh,52px)}
+.sheet.bot{height:clamp(80px,13vh,150px)}
+.shead{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--clay-ink)}
+
+.row{position:relative}
+
+/* compact, non-openable line for a project with no written case study yet.
+   Deliberately not a button: nothing to click, nothing to open. Chosen
+   2026-09-17 over three other treatments (dimmed full row, dimmed + a
+   pending tag, a dashed ghost card matching the M&A vision panel) as the
+   clearest signal that this is a different kind of listing, not a broken
+   accordion. */
+.crow{background:var(--paper);border-top:1px solid var(--line)}
+.crow:first-of-type{border-top:0}
+.chead-bar{background:var(--paper);display:flex;align-items:center;gap:14px;padding:52px var(--gut) 6px}
+.chead-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--clay-ink);white-space:nowrap}
+.chead-rule{flex:1;height:1px;background:var(--line)}
+@media(max-width:640px){.chead-bar{padding-top:36px}}
+.crow .wrap{display:flex;align-items:baseline;gap:22px;padding:26px var(--gut)}
+.crow .clogo{display:flex;align-items:center;height:22px;max-width:60px;opacity:.65;flex-shrink:0}
+.crow .clogo img{max-height:22px;max-width:60px;height:auto;width:auto;display:block}
+.crow .clogo img.ink{filter:invert(1)}
+.crow .ctxt{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;color:var(--ink);
+  letter-spacing:-.01em;flex:1;min-width:0}
+.crow .ctxt b{color:var(--ink);font-weight:700}
+.crow .ctag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--clay-ink);white-space:nowrap}
+@media(max-width:640px){.crow .wrap{padding:20px var(--gut)}.crow .ctxt{font-size:14px}.crow .clogo{display:none}}
+/* the first row sits straight under the section label, no rule between them */
+.row:first-of-type .head{border-top:0}
+.head{display:block;width:100%;background:var(--paper);border:0;border-top:1px solid var(--line);
+  padding:0;margin:0;cursor:pointer;text-align:left;color:var(--ink);font:inherit;
+  transition:background .32s ease,color .32s ease,border-color .32s ease}
+/* tags sit ABOVE the headline as an eyebrow (Sid, 2026-08-01). They used to hold
+   their own .6fr column, which squeezed the headline to ~32 characters a line and
+   pushed the longer ones to three lines desktop / six mobile. The text column now
+   takes the full 1fr. */
+/* the ( + ) toggle was dropped 2026-08-01 (Sid). Its 54px column went back to the
+   headline. The remaining open/close affordance is the .head:hover colour shift on
+   .nm plus the cursor:pointer; the whole row is still the button. */
+.head .wrap{display:grid;grid-template-columns:minmax(0,1fr) 112px;
+  column-gap:24px;row-gap:19px;align-items:center;
+  padding-top:clamp(44px,6.6vh,72px);padding-bottom:clamp(44px,6.6vh,72px)}
+/* 90% cap so a long headline stops short of the logo column instead of running
+   up against it. Reset to full width on mobile, where nothing sits beside it. */
+.nm{grid-column:1;grid-row:2;max-width:90%;font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:clamp(20px,2.5vw,38px);line-height:1.08;letter-spacing:-.035em}
+.sub{display:block;font-family:'JetBrains Mono',monospace;font-weight:400;font-size:10.5px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--clay-ink);margin-top:14px;
+  transition:color .32s ease}
+.tags{grid-column:1;grid-row:1;font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  letter-spacing:.13em;
+  text-transform:uppercase;color:var(--soft);line-height:1.4;transition:color .32s ease}
+.logo{grid-column:2;grid-row:1/span 2;display:flex;align-items:center;justify-content:center;height:56px}
+.logo img{max-height:56px;max-width:112px;width:auto;height:auto;display:block}
+/* every UBC asset in the repo is white on transparent, drawn for the old dark
+   console, so the shield is invisible on this white sheet without inverting it. */
+.logo img.ink{filter:invert(1)}
+/* no logo file for UFV in assets/, so the slot carries the initials instead of sitting empty */
+.logo .stand{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;
+  letter-spacing:.06em;color:var(--line2);transition:color .32s ease}
+
+/* plain hover. an earlier version dropped the row background to expose the live
+   raster behind the sheet; Sid cut it as a distraction. */
+.head:hover .nm{color:var(--clay-ink)}
+
+.panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.16,1,.3,1)}
+.row.open .panel{grid-template-rows:1fr}
+.panel>div{overflow:hidden;background:var(--paper)}
+.bin{padding-top:6px;padding-bottom:clamp(38px,6vh,64px);--recw:868px}
+
+.oneline{font-size:clamp(20px,2.05vw,30px);line-height:1.28;letter-spacing:-.02em;
+  max-width:40ch;margin-bottom:24px}
+.oneline em{font-style:normal;color:var(--clay-ink)}
+
+/* the bordered table, not the flex band. Sid picked this off the v3 "document"
+   variant: one row per figure, number cell then label cell. */
+.figs{display:block;max-width:var(--recw);border:1px solid var(--line);border-bottom:0}
+.figs>div{display:grid;grid-template-columns:clamp(96px,15vw,168px) minmax(0,1fr);
+  align-items:center;border-bottom:1px solid var(--line)}
+.figs b{display:block;font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:clamp(22px,2.3vw,30px);letter-spacing:-.035em;color:var(--clay-ink);line-height:1;
+  padding:clamp(16px,2.4vh,24px) clamp(14px,2vw,26px)}
+.figs span{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--soft);line-height:1.7;
+  border-left:1px solid var(--line);padding:clamp(16px,2.4vh,24px) clamp(14px,2vw,26px)}
+
+.diagram{margin-top:56px;max-width:var(--recw)}
+.diagram svg{width:100%;height:auto;display:block}
+/* vision panels: dashed clay border + wash, so a reader can never mistake a
+   roadmap mockup for a shipped screenshot. See the M&A row's closing beat. */
+.vpanel{margin-top:32px;max-width:var(--recw);border:1px dashed var(--clay);
+  background:#FFFDFB;padding:24px}
+.vpanel svg{width:100%;height:auto;display:block}
+.top{margin-top:56px}
+.vid{width:min(100%,var(--recw));aspect-ratio:16/9;background:#000;position:relative}
+.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.vid iframe:focus{outline:none}
+.film{position:relative;width:min(100%,var(--recw));aspect-ratio:16/9;background:#000;overflow:hidden;cursor:pointer}
+.film>img{width:100%;height:100%;object-fit:cover;opacity:.72}
+.film .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.film .play i{width:70px;height:70px;border:1.5px solid rgba(244,239,229,.85);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-style:normal;color:#F4EFE5;
+  font-size:15px;padding-left:4px}
+.film iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.top>img{width:min(100%,var(--recw));display:block}
+
+/* THE STORY: one column, no labels. this is the whole point of the control. */
+.story{max-width:660px;margin-top:56px}
+.story p{font-size:16.5px;line-height:1.68;color:var(--ink)}
+.story p+p{margin-top:20px}
+/* descriptive headings, not labels. A founder who reads ONLY these six lines should
+   get the whole story: brief -> name -> the AI call -> the outage -> the result ->
+   what it became. "Context" and "Outcome" tell a skimmer nothing; these do. */
+.story h4.sh{font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:clamp(17px,1.5vw,20px);line-height:1.3;letter-spacing:-.015em;
+  color:var(--ink);margin:48px 0 13px;max-width:46ch}
+.story>*:first-child{margin-top:0}
+.story em{font-style:normal;color:var(--clay-ink)}
+/* the three words the competition is named after, marked inside UBC's own sentence.
+   underline rather than colour: the point is provenance, not emphasis. */
+.story .mark{text-decoration:underline;text-decoration-color:var(--clay);
+  text-decoration-thickness:2px;text-underline-offset:3.5px;text-decoration-skip-ink:none}
+.quote{max-width:var(--recw);margin:48px 0 0;padding-left:26px;border-left:2px solid var(--clay);
+  font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:clamp(17px,1.72vw,23px);line-height:1.38;letter-spacing:-.02em;color:var(--ink)}
+.quote cite{display:block;margin-top:16px;font-weight:400;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--soft);font-style:normal}
+/* boxed, washed and monospaced so it reads as the receipts rather than a footnote.
+   the wash is clay at 5%, derived from the palette, not a new hue. */
+.credits{max-width:var(--recw);margin-top:clamp(28px,3.6vh,40px);
+  border:1px solid var(--line);background:rgba(204,91,62,.05);
+  padding:clamp(22px,3vh,30px) clamp(20px,2.6vw,32px);
+  font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.78;color:var(--soft)}
+.credits b{font-weight:700;color:var(--clay-ink)}
+
+/* the next questions. NOT the bordered-table treatment used by the figures and the
+   rooms: those are evidence, these are ambition, so they get air and size instead
+   of cells. */
+/* .story p+p{margin-top:20px} outranks a bare .qs-head, because the label IS a <p>
+   following a <p>. Scoped selector so the intended spacing wins. */
+.story p.qs-head{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--clay-ink);margin-top:clamp(44px,5.6vh,60px)}
+.qs{max-width:var(--recw);margin-top:10px;border-top:1px solid var(--line)}
+.qs>div{display:grid;grid-template-columns:52px minmax(0,1fr);align-items:baseline;
+  gap:0 10px;padding:clamp(15px,2vh,20px) 0;border-bottom:1px solid var(--line)}
+.qs b{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;
+  letter-spacing:.12em;color:var(--clay-ink)}
+.qs span{font-size:clamp(16px,1.5vw,20px);line-height:1.36;letter-spacing:-.015em;color:var(--ink)}
+@media(max-width:640px){.qs>div{grid-template-columns:38px minmax(0,1fr)}}
+
+/* the five rooms. same bordered-table language as the figures, because it is the
+   same job: discrete facts that should be scanned, not read. */
+.rooms{max-width:var(--recw);border:1px solid var(--line);border-bottom:0;margin-top:8px}
+.rooms>div{display:grid;grid-template-columns:clamp(140px,19vw,244px) minmax(0,1fr);
+  border-bottom:1px solid var(--line)}
+/* the industry name is the heading of its row, so it must not be smaller than the
+   sentence it heads. It was 12px against a 14.5px description. */
+.rooms b{font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:clamp(13.5px,1.16vw,16px);
+  letter-spacing:-.005em;color:var(--clay-ink);line-height:1.38;
+  padding:clamp(15px,2vh,20px) clamp(13px,1.7vw,22px)}
+.rooms span{font-size:14.5px;line-height:1.6;color:var(--ink);
+  border-left:1px solid var(--line);padding:clamp(15px,2vh,20px) clamp(13px,1.7vw,22px)}
+/* a bordered block needs more air beneath it than a paragraph does; 26px read as
+   attached to the table rather than following from it. */
+.story .after-table{margin-top:clamp(32px,4.4vh,44px)}
+@media(max-width:640px){.rooms>div{grid-template-columns:1fr}
+  .rooms span{border-left:0;padding-top:0}
+  .rooms b{padding-bottom:6px}}
+
+/* a logo shown at a size where its construction is visible */
+/* the wordmark is black, so this is a LIGHT panel. It was dark when the asset was
+   the bare symbol; a dark background would swallow the type. */
+.logoshot{margin-top:6px;padding:clamp(30px,4.4vh,52px) clamp(26px,3.4vw,48px);
+  border:1px solid var(--line);background:#FAFAF9;
+  display:flex;justify-content:center;align-items:center;max-width:var(--recw)}
+.logoshot img{width:min(100%,440px);height:auto;display:block}
+
+/* the people. understated on purpose: a wall of names competes with nothing, and
+   the point is that it was not a solo job. */
+.thanks{max-width:var(--recw);margin-top:clamp(36px,4.8vh,50px);
+  padding-top:clamp(24px,3vh,30px);border-top:1px solid var(--line)}
+.th-head{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--clay-ink);margin-bottom:18px}
+/* a grid, not a middot run-on. Fifteen names in a flowing line read as a footer and
+   cannot be scanned; one per cell makes each person findable. No borders, so it does
+   not become a third table next to the figures and the rooms. */
+.th-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));
+  gap:11px 30px}
+.th-list span{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.5;
+  color:var(--ink);letter-spacing:-.005em}
+@media(max-width:640px){.th-list{grid-template-columns:1fr;gap:9px}}
+
+/* labelled record, still used by the 16 rows that have no hand-written story yet */
+.rec{margin-top:64px;border-top:1px solid var(--line);max-width:var(--recw)}
+.seg{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px 34px;
+  padding:30px 0;border-bottom:1px solid var(--line)}
+.seg:last-child{border-bottom:0}
+.lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--clay-ink);padding-top:7px}
+.txt{font-size:16px;line-height:1.62;color:var(--ink);max-width:660px}
+.txt p+p{margin-top:16px}
+.txt em{font-style:normal;color:var(--clay-ink)}
+.tbc{color:var(--soft);font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.04em}
+
+.site{display:inline-block;margin-top:30px;font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.1em;color:var(--soft);border-bottom:1px solid var(--line2);padding-bottom:2px}
+.site:hover{color:var(--clay-ink);border-color:var(--clay-ink)}
+
+/* the ONLY horizontal thing left: the pictures */
+.gal{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;
+  margin-right:calc(-1 * var(--pad));margin-top:16px}
+.gal::-webkit-scrollbar{display:none}
+.gal img{height:clamp(190px,23vw,300px);width:auto;object-fit:cover;display:block;flex:0 0 auto}
+/* a vertical wheel does NOT move a horizontal-only scroller, so a mouse user has no
+   way into the pictures without these. Touch keeps the swipe and hides them. */
+.galwrap{margin-top:72px}
+.galbar{display:flex;align-items:center;gap:12px;max-width:var(--recw)}
+.gallabel{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--soft)}
+.galrule{flex:1;height:1px;background:var(--line)}
+.galnav{display:flex;gap:6px}
+.galnav button{width:34px;height:28px;border:1px solid var(--line2);background:transparent;
+  font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1;color:var(--soft);
+  cursor:pointer;transition:background .18s ease,color .18s ease,border-color .18s ease}
+.galnav button:hover:not(:disabled){background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.galnav button:disabled{opacity:.28;cursor:default}
+@media(hover:none){.galnav{display:none}}
+@media(hover:hover){.gal{cursor:grab}.gal.drag{cursor:grabbing}.gal.drag *{pointer-events:none}}
+
+/* buuuk's own brand red, quoted directly from buuuk.com's client wall, not the
+   site's --clay. The point is to lift the exact section, not restyle it. */
+.clientwall{margin-top:56px;background:#EF4531;
+  padding:clamp(40px,6vh,64px) clamp(32px,4vw,56px)}
+.cw-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(52px,7vh,76px) 32px;
+  align-items:center;justify-items:center}
+.cw-grid img{height:30px;width:auto;max-width:150px;object-fit:contain;display:block}
+@media(max-width:1100px){.cw-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.cw-grid{grid-template-columns:repeat(2,1fr);gap:clamp(36px,6vh,48px) 24px}}
+
+@media(max-width:900px){
+  .head .wrap{grid-template-columns:minmax(0,1fr) 62px;column-gap:12px;row-gap:14px}
+  /* the eyebrow frees row 1, so logo and toggle move up beside the TAGS and the
+     headline takes the full width. Keeping them beside the headline left it 191px
+     of 331 and ran the longest lines to six. */
+  .tags{grid-column:1;grid-row:1;margin-top:0}
+  .nm{grid-column:1/-1;grid-row:2;max-width:100%}
+  .logo{grid-column:2;grid-row:1}
+  .seg{grid-template-columns:1fr;gap:6px;padding:20px 0}
+  .oneline{max-width:none}
+  .bin{--recw:100%}
+  .figs{gap:22px 34px}
+}
+
+@media(max-width:760px){
+  :root{--pad:22px}
+  .wrap{padding:0 22px}
+}
+@media(prefers-reduced-motion:reduce){
+  .rv,.go .rv{opacity:1;transform:none;transition:none}
+  .mask i,.go .mask i{transform:none;transition:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="raster"></canvas>
+<div class="scanlines"></div>
+<div class="veil"></div>
+<div class="grain"></div>
+
+<!-- ================= TOP BAR ================= -->
+<div class="topbar"><div class="wrap">
+  <span class="mark">Sid Karwal</span>
+  <nav class="acts">
+    <!-- DISABLED 2026-08-01 by Sid. Re-enable when assets/sid-karwal-pitch.pdf exists.
+    <a class="btn" href="assets/sid-karwal-pitch.pdf" download>Download pitch</a>
+    -->
+    <a class="btn solid" href="https://calendly.com/sidkarwal/call" target="_blank" rel="noopener">Schedule a call</a>
+  </nav>
+</div></div>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="inner"><div class="wrap">
+    <h1><span class="mask"><i>I&rsquo;m a Builder</i></span></h1>
+    <p class="list rv d3">AI agents, web &amp; mobile apps, growth engines, brand systems, video podcasts, immersive experiences, bonsai</p>
+  </div></div>
+</header>
+
+<!-- ================= WORK ================= -->
+<!-- copy lifted from archive/v2-2026-07/concept-console.html, unchanged. -->
+<section class="work">
+  <div class="sheet top"><div class="wrap">
+    <p class="shead">Selected work</p>
+  </div></div>
+
+  <article class="row">
+    <button class="head"><div class="wrap">
+      <span class="nm">A flagship UBC competition where sixteen year olds take on humanity's biggest challenges
+        <span class="sub">The Big Question, New Delhi</span></span>
+      <span class="tags">Strategy / Brand / Content / Ops</span>
+      <span class="logo"><img class="ink" src="assets/the-big-question/ubc-crest.png" alt="The University of British Columbia"></span>
+    </div></button>
+    <div class="panel"><div><div class="wrap"><div class="bin">
+      <p class="oneline">Teams of four from the top schools of New Delhi. Six hours, no internet, no AI. <em>One question: what happens to petrol stations when cars become autonomous?</em></p><div class="figs"><div><b>150</b><span>student attendees</span></div><div><b>37</b><span>top schools of New Delhi, India</span></div><div><b>6 wks</b><span>of pre-learning before the day</span></div><div><b>6 hrs</b><span>no internet, no AI</span></div><div><b>v1</b><span>of an IP-worthy flagship competition</span></div></div><div class="credits"><b>I owned it end to end.</b> The concept and the question. The name, the brand and the design system. The event website and the pre-learning website. The run of show and the vendor briefs. Every printed thing in the room. Delegate and counsellor communication, the certificates, all the photography and media production. The forty-slide report that went back to UBC afterwards.</div><div class="top"><div class="film" data-yt="k1o8HLlSnbI"><img src="assets/the-big-question/tbq-room-full.jpg" alt=""><div class="play"><i>&#9654;</i></div></div></div><div class="story"><h4 class="sh">The brief was two lines: make it IP-worthy and flagship, and make it something UBC can run year on year</h4><p>The second line is the hard one. Anyone can produce a good day. Something that survives being run again needs a question worth six hours of a sixteen year old&rsquo;s full attention, and it has to be one they answer themselves.</p><h4 class="sh">The real opportunity was building the competition out of UBC&rsquo;s own values, so the institution could own it</h4><p>UBC&rsquo;s vision is &ldquo;inspiring people, ideas and actions for a better world&rdquo;, and page five of its strategic plan says the university&rsquo;s partnerships exist to &ldquo;carry out innovative, interdisciplinary research, <span class="mark">ask big questions</span>, advance knowledge on pressing issues and deliver solutions with broad local and global impact.&rdquo; The competition was designed to hit as many of those as one room can. The name fell out of the middle of that sentence.</p><h4 class="sh">AI was cut because with Gemini and Claude in the room, every team arrives at the same answer</h4><p>You would be testing the model, not the room. The rule held for six hours with no phones and no internet, and afterwards the students defended it better than we did.</p><h4 class="sh">Four days out, Canvas went down and took the entire pre-learning course with it</h4><p>Canvas is the platform half of North American higher education is enrolled on. I rebuilt all six modules as a static site in a day, wrote a no-op SCORM shim so the courseware would run with nothing behind it, registered a domain and shipped it. The students never knew.</p><h4 class="sh">Twenty schools would have been a good day. Thirty-seven of Delhi&rsquo;s top schools came</h4><p>Five rooms ran in parallel, one industry each, every team working the same scenario: by 2050 autonomous electric vehicles dominate Indian roads and the businesses built around human driving are running out of road.</p><h4 class="sh">Five breakout rooms, five industries that self-driving cars will undo, each still sitting on assets worth reusing</h4><div class="rooms"><div><b>Petrol stations<br>&amp; highway retail</b><span>Cars pick their own charging point on efficiency and fleet coordination, and nobody steps out for snacks. What is left: prime roadside access, grid connections, large sites.</span></div><div><b>Highway motels<br>&amp; rest areas</b><span>Passengers sleep, work and watch films while the car drives through the night, so the stop disappears. What is left: highway frontage, standing buildings, a chain of them along every route.</span></div><div><b>Parking garages<br>&amp; lots</b><span>After drop-off the vehicle relocates itself somewhere cheaper or moves to its next pickup. What is left: multi-level space, power, and some of the best-placed land in the city.</span></div><div><b>Dealerships<br>&amp; service centres</b><span>Shared fleets replace ownership, software updates itself, maintenance is predicted before it is needed. What is left: indoor facilities, service bays, and skilled technicians.</span></div><div><b>Insurance &amp; roadside assistance</b><span>Vehicles react faster than people and crashes collapse, but new risk arrives: software failure, cyberattack, grid outage, extreme weather. What is left: customer networks, real-time data, emergency response.</span></div></div><p class="ptxt after-table">Every team came back with three things: an engineering solution for 2050, a viable business model, and a transformation strategy. Then they pitched it. Seven minutes on their feet, first in a small room, then in front of the full auditorium.</p><h4 class="sh">Delhi was built as version one of something designed to run again</h4><p>The format runs as a national league across cities, which is what the proposal written after it argues for. It takes any question big enough to be worth six hours of a sixteen year old, and those are not hard to find.</p><p class="qs-head">Questions I would run next</p><div class="qs"><div><b>01</b><span>How do we feed ten billion people sustainably?</span></div><div><b>02</b><span>What happens to a city when the groundwater runs out?</span></div><div><b>03</b><span>What happens to a hospital when diagnosis is free and instant?</span></div></div></div><blockquote class="quote">The one lesson that I have learned is definitely that we barely know anything out there. There are hundreds and hundreds of other people who are much more experienced in the fields that we think we are experienced in. We just need to be humble and open to any kind of knowledge.<cite>A competitor, afterwards</cite></blockquote><div class="thanks"><p class="th-head">It took a lot of people</p><div class="th-list"><span>Aditya Akre</span><span>Dr Gurneet Singh Anand</span><span>Ssonam Dutta</span><span>Anmol Kaushal</span><span>Tanushree Bhattacharya</span><span>Paramjit Nanson</span><span>Kirsten Molstad</span><span>Wendy McHardy</span><span>Melissa Guillergan</span><span>Bhuvan Grover</span><span>Arun Sharma</span><span>Anurag George Ekka</span><span>Diya Anand</span><span>Dr Rajesh Vijayaraghavan</span><span>Dr Stephen O&rsquo;Leary</span><span>Dr Darren Dahl</span><span>Dr James Olson</span><span>UBC Alumni Association</span></div></div><a class="site" href="https://thebigquestion.ubc.ca" target="_blank" rel="noopener">thebigquestion.ubc.ca &nearr;</a><div class="galwrap"><div class="galbar"><span class="gallabel">Gallery</span><span class="galrule"></span><span class="galnav"><button type="button" data-d="-1" aria-label="Previous">&larr;</button><button type="button" data-d="1" aria-label="Next">&rarr;</button></span></div>
+      <div class="gal">
+        <img src="assets/the-big-question/tbq-room-full.jpg" alt="The Grand Ballroom set, before anyone arrived" loading="lazy">
+        <img src="assets/the-big-question/tbq-badge.jpg" alt="A delegate badge" loading="lazy">
+        <img src="assets/the-big-question/tbq-room.jpg" alt="The room, full" loading="lazy">
+        <img src="assets/the-big-question/tbq-teams.jpg" alt="Teams working, heads down" loading="lazy">
+        <img src="assets/the-big-question/tbq-06863.jpg" alt="A team presenting their solution design" loading="lazy">
+        <img src="assets/the-big-question/tbq-wide.jpg" alt="The floor watching" loading="lazy">
+        <img src="assets/the-big-question/tbq-competition.jpg" alt="Counsellors and judges watching a pitch" loading="lazy">
+        <img src="assets/the-big-question/tbq-04860.jpg" alt="The room from the back, at capacity" loading="lazy">
+        <img src="assets/the-big-question/tbq-cover.jpg" alt="A student at the microphone" loading="lazy">
+        <img src="assets/the-big-question/tbq-stage.jpg" alt="On stage" loading="lazy">
+        <img src="assets/the-big-question/tbq-crew.jpg" alt="The crew" loading="lazy">
+      </div></div>
+    </div></div></div></div>
+  </article>
+
+  <article class="row">
+    <button class="head"><div class="wrap">
+      <span class="nm">Software that automates 90% of the deal sourcing workflow for M&amp;A teams
+        <span class="sub">In build, for a family office</span></span>
+      <span class="tags">AI agents / Automation / Data / Product</span>
+      <span class="logo"><img src="assets/logos/ma-aperture.svg" alt="Deal sourcing system"></span>
+    </div></button>
+    <div class="panel"><div><div class="wrap"><div class="bin">
+      <p class="oneline">Most deal sourcing finds the companies that are easy to find. <em>This finds the ones nobody has listed.</em></p><div class="figs"><div><b>9,000+</b><span>companies sourced and scored</span></div><div><b>592</b><span>public data sources</span></div><div><b>16</b><span>countries covered</span></div><div><b>2,000x</b><span>cost spread across the funnel</span></div><div><b>5</b><span>stages before a shortlist</span></div><div><b>3</b><span>model tiers, 14 task types</span></div></div><div class="credits"><b>I own it end to end.</b> The architecture through to the React front end. The connector interface, the entity resolver, the tiered funnel, the scoring engine, the model gateway. The data model and the provenance layer underneath the numbers, and the call to throw the first version away and start over.</div>      <div class="diagram">
+<svg viewBox="0 0 868 252" role="img" aria-label="The tiered funnel: five stages, narrowing, with the cost per company at each stage. No model spend happens before triage.">
+  <g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.6" fill="#5A5247">
+    <text x="87" y="44" text-anchor="middle">DISCOVERED</text>
+    <text x="260" y="44" text-anchor="middle">IDENTIFIED</text>
+    <text x="434" y="44" text-anchor="middle">TRIAGED</text>
+    <text x="608" y="44" text-anchor="middle">ENRICHED</text>
+    <text x="781" y="44" text-anchor="middle">VERIFIED</text>
+  </g>
+  <!-- opacity rises with cost per record, so the money is visible as weight -->
+  <g stroke="#FFFFFF" stroke-width="1">
+    <polygon points="0,75 174,83.4 174,176.6 0,185"     fill="#B5462E" fill-opacity=".07"/>
+    <polygon points="174,83.4 347,91.8 347,168.2 174,176.6" fill="#B5462E" fill-opacity=".12"/>
+    <polygon points="347,91.8 521,100.2 521,159.8 347,168.2" fill="#B5462E" fill-opacity=".26"/>
+    <polygon points="521,100.2 694,108.6 694,151.4 521,159.8" fill="#B5462E" fill-opacity=".48"/>
+    <polygon points="694,108.6 868,117 868,143 694,151.4"  fill="#B5462E" fill-opacity=".82"/>
+  </g>
+  <!-- everything left of this line is deterministic. no model is called. -->
+  <line x1="347" y1="58" x2="347" y2="196" stroke="#B5462E" stroke-width="1" stroke-dasharray="3 3"/>
+  <g font-family="JetBrains Mono, monospace" font-size="11" fill="#0A0A0A">
+    <text x="87" y="212" text-anchor="middle" fill="#5A5247">no spend</text>
+    <text x="260" y="212" text-anchor="middle" fill="#5A5247">no spend</text>
+    <text x="434" y="212" text-anchor="middle">$0.001-0.01</text>
+    <text x="608" y="212" text-anchor="middle">$0.02-0.10</text>
+    <text x="781" y="212" text-anchor="middle">$0.50-2.00</text>
+  </g>
+  <g font-family="JetBrains Mono, monospace" font-size="9.5" letter-spacing="1.3" fill="#B5462E">
+    <text x="341" y="242" text-anchor="end">DETERMINISTIC UNTIL HERE</text>
+    <text x="353" y="242">FIRST MODEL CALL. COST PER COMPANY, PER STAGE</text>
+  </g>
+</svg>
+      </div><div class="story"><h4 class="sh">A family office wanted what a deal sourcing team finds, without hiring one</h4><p>Most sourcing software finds the companies that are already easy to find, the ones already indexed, ranked and pitched to everyone else looking. This is built to find the rest: profitable, quietly run businesses that never show up on a shortlist because nobody indexed them in the first place. What falls out of a normal run looks like this, one registry ID per row, a confidence badge, a revenue band, and how many sources stand behind each number.</p><div class="top"><img src="assets/ma-system/shortlist.png" alt="A shortlist of scored companies, each carrying a confidence badge, a revenue band and a source count"></div><h4 class="sh">Version one was an agentic browser that searched the way an analyst would, and it died at a few hundred companies</h4><p>It worked, technically. But two things break at once when an agent tries to reason across a whole market: it cannot hold the market in its head, and the model bill grows faster than the shortlist does. Everyone building agents hits this wall eventually. Most people respond by buying a bigger model.</p><h4 class="sh">So the rebuild treats model calls as the scarcest resource in the system, not the cheapest</h4><p>Triage is deterministic and free, no model spend at all until a company has already earned a second look. Verification, the expensive end, costs up to two dollars a company and only runs on what survives that far. That is a two thousand times spread between the cheapest step and the priciest one, and the whole funnel exists to keep the expensive end small. The worker tracks its own spend against a daily budget and stops itself rather than running away.</p><div class="top"><img src="assets/ma-system/budget.png" alt="The daily model-spend budget broken down by pipeline stage, paused after reaching its limit"></div><h4 class="sh">Underneath it: a connector interface, a write-time entity resolver, a scoring engine and a model gateway</h4><p>Architecture through to the React front end, and a decision partway through to throw the first version away rather than patch it. But the moat isn&rsquo;t any of that, it is the data and the provenance layer underneath: matching on registry ID with checksum validation first, then apex domain plus country, then probabilistic matching inside a blocking key. Never on name alone, and never across a border on a name at all, because a wrongly merged company is invisible in a way a missed one is not.</p><h4 class="sh">Confidence and provenance sit on every field, not every record</h4><p>A company can carry a verified registry number and an estimated revenue band at the same time, and the interface says which is which, down to what sourced each individual field. Every model output has to pass a cite-or-unknown check, then retries, then escalates to a stronger model, then goes to a human. Nothing low-confidence gets accepted silently, and when the daily budget runs out the worker pauses and picks up again the next day rather than overspending quietly.</p><div class="top"><img src="assets/ma-system/provenance.png" alt="A single company record expanded, with each field marked verified or estimated and the source behind it"></div><h4 class="sh">The sourcing and trust layers are built. The reasoning layer isn&rsquo;t, yet</h4><p>Everything above ships. What follows doesn&rsquo;t: a system that notices the moment a company becomes sellable instead of waiting for the next scan, and writes the memo a partner would actually read, held to the same rule as everything else here, cite what&rsquo;s verified, flag what isn&rsquo;t, never invent the rest.</p><div class="vpanel"><svg viewBox="0 0 868 170" role="img" aria-label="A loop: watch known companies, detect when something changes, match against the buyer's thesis, write the memo, surface it, then watch again, continuously rather than as a one-time scan."><g font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="1.4" fill="#B5462E" font-weight="700"><text x="87" y="26" text-anchor="middle">WATCH</text><text x="260" y="26" text-anchor="middle">DETECT</text><text x="434" y="26" text-anchor="middle">MATCH</text><text x="608" y="26" text-anchor="middle">WRITE</text><text x="781" y="26" text-anchor="middle">SURFACE</text></g><g stroke="#CC5B3E" stroke-width="1.3" stroke-dasharray="3 3" fill="none"><line x1="115" y1="56" x2="232" y2="56"/><line x1="288" y1="56" x2="406" y2="56"/><line x1="462" y1="56" x2="580" y2="56"/><line x1="636" y1="56" x2="753" y2="56"/></g><g fill="#CC5B3E"><path d="M232,56 L222,51 L222,61 Z"/><path d="M406,56 L396,51 L396,61 Z"/><path d="M580,56 L570,51 L570,61 Z"/><path d="M753,56 L743,51 L743,61 Z"/></g><g fill="#FFFDFB" stroke="#CC5B3E" stroke-width="1.3" stroke-dasharray="3 3"><circle cx="87" cy="56" r="28"/><circle cx="260" cy="56" r="28"/><circle cx="434" cy="56" r="28"/><circle cx="608" cy="56" r="28"/><circle cx="781" cy="56" r="28"/></g><g font-family="JetBrains Mono, monospace" font-size="14" fill="#0A0A0A" text-anchor="middle" font-weight="700"><text x="87" y="61">01</text><text x="260" y="61">02</text><text x="434" y="61">03</text><text x="608" y="61">04</text><text x="781" y="61">05</text></g><g font-family="JetBrains Mono, monospace" font-size="9.5" fill="#5A5247" text-anchor="middle"><text x="87" y="102">re-checks known</text><text x="87" y="114">companies daily</text><text x="260" y="102">a raise stalls, a</text><text x="260" y="114">rival exits, etc</text><text x="434" y="102">against this</text><text x="434" y="114">buyer&apos;s thesis</text><text x="608" y="102">cite verified,</text><text x="608" y="114">flag unknowns</text><text x="781" y="102">the memo, to</text><text x="781" y="114">the principal</text></g><text x="434" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" letter-spacing="1.2" fill="#B5462E" font-weight="700">05 FEEDS BACK INTO 01. CONTINUOUS, NOT A ONE-TIME SCAN</text></svg></div><div class="top"><img src="assets/ma-system/trigger-feed.png" alt="A feed of companies resurfacing because something changed: a stalled raise, a competitor exit, a founder stepping back"></div><div class="top"><img src="assets/ma-system/memo.png" alt="A synthesized one-page memo on a single company, its claims traced back to verified and estimated fields, with unknowns stated plainly"></div></div>
+    </div></div></div></div>
+  </article>
+
+  <article class="row">
+    <button class="head"><div class="wrap">
+      <span class="nm">The most immersive breathwork training in the world, built from the inside
+        <span class="sub">Evolution of Breath, India, Egypt, South Africa</span></span>
+      <span class="tags">Strategy / Brand / Platform</span>
+      <span class="logo"><img src="assets/evolution-of-breath/eob-mark.svg" alt="Evolution of Breath"></span>
+    </div></button>
+    <div class="panel"><div><div class="wrap"><div class="bin">
+      <p class="oneline">Three hundred hours of training before I wrote a word. <em>You cannot build the machine for a practice you have not done.</em></p><div class="figs"><div><b>300+</b><span>hours, 27 days in the Himalayas</span></div><div><b>300+</b><span>facilitators trained</span></div><div><b>40K+</b><span>community</span></div></div><div class="credits"><b>I owned it end to end.</b> The brand system. The logo, set to the pyramid&rsquo;s exact angles, sacred geometry to the degree. The website. The positioning and the language of the programme. The content. Showing his curriculum so a stranger understands four weeks of their life in one sitting. The funnel and the audience architecture. The community growth.</div><div class="top"><div class="film" data-yt="BIHJeFEWFXI"><img src="assets/evolution-of-breath/eob-loop-poster.jpg" alt=""><div class="play"><i>&#9654;</i></div></div></div><div class="story"><h4 class="sh">Mike O&rsquo;Meara named it and taught it, and everything that had to exist around the teaching was mine to build</h4><p>The brand system, the website, the content, and a way to show his curriculum so the teaching could reach the people looking for it.</p><h4 class="sh">Before putting a brand on a five generation lineage, I went back to its source and asked permission</h4><p>I sat there and meditated and asked permission. It was a profound experience. Anyone can say a training is a lineage. Asking is what makes it one.</p><h4 class="sh">The mark is built on sacred geometry, the pyramid&rsquo;s angles to the exact degree</h4><div class="logoshot"><img src="assets/evolution-of-breath/eob-logo.png" alt="The Evolution of Breath logo"></div><p class="ptxt after-table">The angles are the pyramid&rsquo;s, to the degree, not approximated by eye. A lineage mark should come from a rule, and every angle in the system comes from that one.</p><h4 class="sh">Five different kinds of people arrive at the same door, so I built a separate way in for each</h4><p>A trainee facilitator. A practitioner adding a modality. A seeker with no professional intent. Someone mid-transition. A leader who wants the tools for their own room.</p><h4 class="sh">We got the message across, and the trainings now sell out a year in advance</h4><p>India, South Africa and Egypt. This work was done in 2025; the brand has grown a long way since.</p></div><a class="site" href="https://www.evolutionofbreath.com" target="_blank" rel="noopener">evolutionofbreath.com &nearr;</a><div class="galwrap"><div class="galbar"><span class="gallabel">Gallery</span><span class="galrule"></span><span class="galnav"><button type="button" data-d="-1" aria-label="Previous">&larr;</button><button type="button" data-d="1" aria-label="Next">&rarr;</button></span></div>
+      <div class="gal">
+        <img src="assets/evolution-of-breath/eob-stage.avif" alt="Mike on stage, the mark behind him" loading="lazy">
+        <img src="assets/evolution-of-breath/eob-community.avif" alt="The cohort" loading="lazy">
+        <img src="assets/evolution-of-breath/eob-icebath.avif" alt="Ice bath, part of the curriculum" loading="lazy">
+        <img src="assets/evolution-of-breath/eob-web-hero.png" alt="The site" loading="lazy">
+        <img src="assets/evolution-of-breath/eob-web-retreat.png" alt="The site, about the retreat" loading="lazy">
+      </div></div>
+    </div></div></div></div>
+  </article>
+
+  <article class="row">
+    <button class="head"><div class="wrap">
+      <span class="nm">The marketing engine behind an Apple Design Award studio in Singapore
+        <span class="sub">Buuuk, five years embedded</span></span>
+      <span class="tags">Marketing / Brand / Design / AI agents</span>
+      <span class="logo"><img src="assets/logos/buuuk.svg" alt="Buuuk"></span>
+    </div></button>
+    <div class="panel"><div><div class="wrap"><div class="bin">
+      <p class="oneline">Buuuk builds the mobile applications for Audi, Mercedes-Benz, Decathlon and the Singapore government. <em>Everything a client sees of them online is mine.</em></p><div class="figs"><div><b>5 yrs</b><span>embedded</span></div><div><b>Every</b><span>client-facing channel, one operator</span></div></div><div class="credits"><b>The whole client-facing presence is mine.</b> buuuk.com and everything a buyer reads on it. The writing and the artwork. The case studies. The newsletters. Lead qualification and routing. The research operation underneath all of it, and the agents that run it. The system that tracks which AI engines are reading the site.</div><div class="story"><h4 class="sh">Buuuk builds the applications, and I run everything a client sees of the company online</h4><p>One of only two Apple Design Award winners in South East Asia co-founded the studio in 2008. The engineering and the product work are theirs and needed nothing from me. The website, the writing, the case studies, the newsletters and the way an enquiry gets handled are mine.</p><h4 class="sh">An enterprise buyer researches quietly for months and arrives already decided, so a campaign always reaches them too late</h4><p>A build of this size is never signed because something landed in front of somebody at the right moment. By the time the studio hears from them they have read everything, compared four names and settled the shortlist, in a room nobody from Buuuk was in.</p><h4 class="sh">So every page, case study and piece of writing has to hold up on the day they land, not on the day a campaign runs</h4><p>That includes the newsletters and the way a serious enquiry gets caught and routed to the person who should take it. One standard across every channel, with no soft spots for a buyer to find. It is more work than any one person has hours for.</p><h4 class="sh">So I stopped doing the work and started building the things that do it</h4><p>Agents and pipelines for research, drafting, artwork, competitor tracking and lead triage. The job stopped being how much can I produce and became how good is the machine that produces it.</p><h4 class="sh">The artwork and the visual system are mine, because a studio judged on design cannot have marketing that looks bought</h4><p>A recurring character across the covers, one render language, and a palette that turns with the subject, so a reader landing on any article knows immediately whose it is.</p><h4 class="sh">Then AI took the floor out from under a good deal of what agencies charge for</h4><p>The whole category has spent five years absorbing that, and marketing is where a change in demand shows up first. I spent those five years inside one studio, watching which parts of the model were load bearing and which had only ever been habit.</p></div><div class="clientwall"><div class="cw-grid">
+        <img src="assets/buuuk/client-logos/audi.svg" alt="Audi" loading="lazy">
+        <img src="assets/buuuk/client-logos/pg.svg" alt="P&amp;G" loading="lazy">
+        <img src="assets/buuuk/client-logos/mercedes-benz.svg" alt="Mercedes-Benz" loading="lazy">
+        <img src="assets/buuuk/client-logos/tupperware.svg" alt="Tupperware" loading="lazy">
+        <img src="assets/buuuk/client-logos/smrt.svg" alt="SMRT" loading="lazy">
+        <img src="assets/buuuk/client-logos/singtel.svg" alt="Singtel" loading="lazy">
+        <img src="assets/buuuk/client-logos/starhub.svg" alt="StarHub" loading="lazy">
+        <img src="assets/buuuk/client-logos/db-schenker.svg" alt="DB Schenker" loading="lazy">
+        <img src="assets/buuuk/client-logos/ntuc.svg" alt="NTUC" loading="lazy">
+        <img src="assets/buuuk/client-logos/nea.svg" alt="National Environment Agency" loading="lazy">
+        <img src="assets/buuuk/client-logos/maybank.svg" alt="Maybank" loading="lazy">
+        <img src="assets/buuuk/client-logos/sph.svg" alt="SPH" loading="lazy">
+        <img src="assets/buuuk/client-logos/capitaland.svg" alt="CapitaLand" loading="lazy">
+        <img src="assets/buuuk/client-logos/nlb.svg" alt="NLB Public Libraries" loading="lazy">
+        <img src="assets/buuuk/client-logos/thomson-reuters.svg" alt="Thomson Reuters" loading="lazy">
+        <img src="assets/buuuk/client-logos/global-blue.svg" alt="Global Blue" loading="lazy">
+      </div></div><a class="site" href="https://buuuk.com" target="_blank" rel="noopener">buuuk.com &nearr;</a>
+    </div></div></div></div>
+  </article>
+
+  <article class="row">
+    <button class="head"><div class="wrap">
+      <span class="nm">A counsellor summit designed to be run again, in every market UBC cares about
+        <span class="sub">The Future of Global Learning, with UBC in Goa</span></span>
+      <span class="tags">Programme / Brand / Ops / Research</span>
+      <span class="logo"><img class="ink" src="assets/the-big-question/ubc-crest.png" alt="The University of British Columbia"></span>
+    </div></button>
+    <div class="panel"><div><div class="wrap"><div class="bin">
+      <p class="oneline">Counsellors get sold to by universities all year. <em>So we sent professors instead of marketers.</em></p><div class="figs"><div><b>27</b><span>counsellors, 25 international schools</span></div><div><b>3,500+</b><span>students they advise every year</span></div><div><b>3</b><span>UBC professors, months of preparation</span></div><div><b>100%</b><span>rated it excellent, on 17 responses</span></div><div><b>30 min</b><span>recorded interview with every counsellor</span></div><div><b>3 days</b><span>one room, residential</span></div></div><div class="credits"><b>What was mine.</b> The name. The brand and the design system. The event design. The delegate communications and the print. The interviews, from the setup to the thirty minutes with each counsellor to the post-production. The photography. Then the intelligence briefing that went to UBC leadership.</div>
+      <div class="top"><img src="assets/future-of-global-learning/fugl-hero.jpg" alt="The summit in Goa" loading="lazy"></div><div class="story"><h4 class="sh">The first sprint to engage the top schools in India, built so that nobody in the room was sold to</h4><p>A school counsellor is the single most influential voice in where a student applies, which is exactly why every university on earth treats her as a distribution channel. Twenty-seven came to Goa from twenty-five international schools, across Tier 1, 2 and 3 cities. Between them they advise around three and a half thousand senior students a year.</p><h4 class="sh">Three UBC professors spent months building sessions for counsellors, not adapting lectures they already had</h4><p>Three sessions built from nothing for an audience they had never taught: the hidden curriculum, teaching in the age of AI, and the foundations of academic success. Each one shaped around what a counsellor actually does with a student, rather than around what a university wants said about itself. They cared whether it was genuinely useful to these people, and months of work went in on that basis alone. It is the reason the room worked.</p><h4 class="sh">The whole thing was designed on one premise, that a counsellor is the most important stakeholder a university has</h4><p>Three residential days, one room, faculty present throughout and no students anywhere in it. A counsellor put the value of that better than any brief could: a chance to meet faculty one on one and talk about the realities of admissions, chances and limitations. Not a session about how to apply. A conversation between professionals.</p><h4 class="sh">Everything they touched over the three days was made for them</h4><p>The name, the brand and the design system. The delegate communications. The certificates and the name tags. Ninety-four per cent were very satisfied with the venue and hospitality, which is the number that tells you whether people felt looked after rather than processed.</p><h4 class="sh">Every counsellor also sat for a thirty minute recorded interview, which is where the real return was</h4><p>Not testimonials. A research instrument built into the event, which turned three days into country-specific intelligence for UBC and an eighteen point briefing for its leadership. Fourteen counsellors, interviewed separately, independently described the same gap: a seventeen year old is looked after in India and treated as an adult from the first day of a Canadian degree. Nobody had asked them before.</p><h4 class="sh">Goa was version one, and it was built from the first day to be run again</h4><p>Every respondent rated it excellent and every one said they would return, on seventeen responses. The next versions are going to China and Indonesia. The ambition is not another summit: it is to build this into the premier school counsellor event in the world, carrying UBC&rsquo;s care into every market it wants to be understood in.</p></div><div class="galwrap"><div class="galbar"><span class="gallabel">Gallery</span><span class="galrule"></span><span class="galnav"><button type="button" data-d="-1" aria-label="Previous">&larr;</button><button type="button" data-d="1" aria-label="Next">&rarr;</button></span></div>
+      <div class="gal">
+        <img src="assets/future-of-global-learning/fugl-counsellor.jpg" alt="Counsellor session" loading="lazy">
+        <img src="assets/future-of-global-learning/fugl-educator.jpg" alt="UBC educator session" loading="lazy">
+        <img src="assets/future-of-global-learning/fugl-networking.jpg" alt="Networking" loading="lazy">
+      </div></div>
+    </div></div></div></div>
+  </article>
+
+  <article class="row">
+    <button class="head"><div class="wrap">
+      <span class="nm">A Canadian university's India campus, rebuilt around learning by doing
+        <span class="sub">University of the Fraser Valley, Chandigarh</span></span>
+      <span class="tags">Strategy / Brand / Web / Ads / Print</span>
+      <span class="logo"><img src="assets/ufv/ufv-mark.svg" alt="University of the Fraser Valley"></span>
+    </div></button>
+    <div class="panel"><div><div class="wrap"><div class="bin">
+      <p class="oneline">A nineteen year old Canadian pathway with a decade of hands-on programmes almost nobody had heard of. <em>I moved the pitch from where you study to what you do there.</em></p><div class="credits"><b>Head of Growth and Strategy, nine months.</b> The positioning and the category. The brand. The website. Social, advertising and the landing pages. The sales call scripts. The print and the 2025/26 viewbook. The programmes and the tracks were the college&rsquo;s, built over a decade before I arrived.</div><div class="story"><h4 class="sh">A Canadian degree you could start in Chandigarh, sold on being close to home</h4><p>The pathway had been running at GGD SD College for nineteen years and fifty thousand UFV alumni were out in the world. The site that families used to decide led on proximity and price: a top ranked Canadian education, started closer to home. It is a true pitch, and it quietly concedes that the real thing is somewhere else.</p><h4 class="sh">Meanwhile the classrooms were doing something almost nobody outside the building knew about</h4><p>A student start-up studio in its tenth year, which had spun out ten student-run companies, earned over thirty lakh rupees and moved thirty thousand units of inventory the students made themselves. Undergraduates managing a fund of one crore. A family business track built on Harvard&rsquo;s Three-Circle Model. An expedition through the Delhi-Mumbai industrial corridor. None of it was faculty theatre, and none of it was on the website.</p><h4 class="sh">So the pitch moved from where you study to what you actually do there</h4><p>Chandigarh&rsquo;s first experiential learning undergraduate programmes. All three degrees renamed around the one idea, and each made to carry its own count of hands-on tracks, five in business, six in computing, two in liberal arts. A claim like that is only worth making if a reader can go and check it, which is why the tracks are named on the page and not summarised.</p><h4 class="sh">Then every surface a family touches had to say the same thing</h4><p>The brand and the positioning. The website. The social channels, the advertising and the landing pages. The scripts the team used on the phone. The print, and the viewbook. A position that only exists on the homepage is decoration; it holds when the person answering the call is saying it too.</p><h4 class="sh">Two years later it is still the first sentence on their homepage</h4><p>Every hands-on track is still named there, and the programmes still carry the word. The category outlived the nine months, which is the only outcome a positioning job can honestly claim.</p></div><a class="site" href="https://ufv.in" target="_blank" rel="noopener">ufv.in &nearr;</a><div class="galwrap"><div class="galbar"><span class="gallabel">Gallery</span><span class="galrule"></span><span class="galnav"><button type="button" data-d="-1" aria-label="Previous">&larr;</button><button type="button" data-d="1" aria-label="Next">&rarr;</button></span></div>
+      <div class="gal">
+        <img src="assets/ufv/site/hero.jpg" alt="The category claim on the UFV India homepage" loading="lazy">
+        <img src="assets/ufv/site/programs.jpg" alt="Three programmes, renamed and rebuilt as experiential" loading="lazy">
+        <img src="assets/ufv/site/handson.jpg" alt="Hands-on practical learning" loading="lazy">
+        <img src="assets/ufv/site/startup.jpg" alt="The practical tracks, and the Student Start-up Studio" loading="lazy">
+        <img src="assets/ufv/site/viewbook.jpg" alt="The 25-26 viewbook" loading="lazy">
+        <img src="assets/ufv/ufv-01.webp" alt="UFV campus" loading="lazy">
+        <img src="assets/ufv/ufv-03.webp" alt="Student at work" loading="lazy">
+      </div></div>
+    </div></div></div></div>
+  </article>
+
+  <article class="row">
+    <button class="head"><div class="wrap">
+      <span class="nm">Cybersecurity, sold to CISOs across APAC
+        <span class="sub">Cyberknights, Singapore</span></span>
+      <span class="tags">GTM / Brand / Web / Research / SEO</span>
+      <span class="logo"><img src="assets/logos/cyberknights.svg" alt="Cyberknights"></span>
+    </div></button>
+    <div class="panel"><div><div class="wrap"><div class="bin">
+      <p class="oneline">A Singapore cybersecurity company selling to enterprises across APAC. <em>I built the go to market, the brand and the website.</em></p><div class="figs"><div><b>35%</b><span>report to the CEO, against 3% in the US</span></div><div><b>4,000+</b><span>security professionals the country is short</span></div><div><b>1 hr</b><span>to notify the regulator, where privacy law allows 72</span></div><div><b>10</b><span>training programmes written</span></div></div><div class="credits"><b>The go to market, the brand and the website.</b> The buyer persona and the regulatory groundwork underneath all of it. The positioning and the strategy. Ten training programme pages. The LinkedIn presence. The search layer, and the comparison guide for buyers weighing one programme against another.</div><div class="story"><h4 class="sh">Before anything could be written, somebody had to write down who actually buys cybersecurity training</h4><p>A Singapore headquartered company selling across the region, with real programmes and a buyer nobody had described. So the first month went into research rather than output: who this person is, what they answer for, and what makes them pick up the phone.</p><h4 class="sh">A Singapore security chief answers to the chief executive far more often than an American one does</h4><p>Thirty-five per cent report to the CEO, against three per cent in the United States. That single difference changes the entire pitch. You are not persuading a technical buyer to escalate something upward; you are talking to somebody already personally answerable to the board. Eighty per cent of them are burnt out and fifty-seven per cent never switch off, which tells you what tone to take and what not to waste their time with.</p><h4 class="sh">And the regulator, not the buyer, sets the clock: one hour to report an incident, not seventy-two</h4><p>MAS gives financial institutions sixty minutes to notify. Multi-factor authentication is mandatory on every administrative account. There is a separate framework from the privacy regulator and another for critical information infrastructure. None of that is background colour. It is the pressure the buyer lives inside, and positioning written without understanding it would have been guesswork.</p><h4 class="sh">The country is short four thousand security professionals, which happens to be exactly what the company sells</h4><p>The top ranked pain in the research turned out to be the product. Four hundred to eight hundred roles open every month and nobody to fill them, against a company whose entire business is training people to do the work. The positioning was not invented, it was found, and that is the argument for spending the first month reading instead of writing.</p><h4 class="sh">Everything a buyer meets was then built on that one person</h4><p>The brand. Ten training programme pages, from security awareness for staff and for the C-suite through penetration testing, red teaming, SOC analysis, threat intelligence, cloud security, secure development and AI defence. The LinkedIn presence, the search layer, a comparison guide for buyers weighing one programme against another, and the site itself.</p></div><a class="site" href="https://cyberknights.sg" target="_blank" rel="noopener">cyberknights.sg &nearr;</a><div class="galwrap"><div class="galbar"><span class="gallabel">Gallery</span><span class="galrule"></span><span class="galnav"><button type="button" data-d="-1" aria-label="Previous">&larr;</button><button type="button" data-d="1" aria-label="Next">&rarr;</button></span></div>
+      <div class="gal">
+        <img src="assets/cyberknights/hero.jpg" alt="The Cyberknights homepage" loading="lazy">
+        <img src="assets/cyberknights/services.jpg" alt="Services" loading="lazy">
+        <img src="assets/cyberknights/capability.jpg" alt="Capability" loading="lazy">
+        <img src="assets/cyberknights/standard.jpg" alt="Singapore's security standard" loading="lazy">
+      </div></div>
+    </div></div></div></div>
+  </article>
+
+  <article class="row">
+    <button class="head"><div class="wrap">
+      <span class="nm">Software companies bought across Asia-Pacific, and never sold on
+        <span class="sub">JumpTech Solutions</span></span>
+      <span class="tags">Brand / Positioning / Webflow / Social</span>
+      <span class="logo"><img class="ink" src="assets/logos/jumptech.svg" alt="JumpTech Solutions"></span>
+    </div></button>
+    <div class="panel"><div><div class="wrap"><div class="bin">
+      <p class="oneline">A permanent home for the founder-led software companies of Asia-Pacific. <em>I built the brand from scratch, and the site, on my own.</em></p><div class="credits"><b>The brand from scratch, and the website.</b> The positioning and the language. The identity. The build. The social presence. Built for the client through 2025.</div><div class="story"><h4 class="sh">JumpTech buys profitable software companies from the people who founded them, and then never sells</h4><p>A forever-hold philosophy, applied to niche enterprise software across Asia-Pacific: cybersecurity, education, logistics, healthcare. They are not a fund looking for an exit in five years, and almost everything about how a company like that has to present itself follows from that one fact.</p><h4 class="sh">Which means the brand is not selling an acquisition. It is asking somebody to hand over the thing they spent a decade building.</h4><p>That is a harder brief than it sounds. The founder on the other side is not comparing offers on price alone. They are trying to work out whether the company will still be recognisable in three years, whether their team will be dismantled, and whether the person they are about to sell to will still be there.</p><h4 class="sh">So the promise had to read as continuation rather than exit</h4><p>Founders stay in control, with equity and operational autonomy. Teams are kept independent and integration happens only where it genuinely helps. Fair valuations, flexible structures, and a safe home for a founder&rsquo;s legacy. Every one of those phrases is aimed at a specific fear, and none of them lead with returns.</p><h4 class="sh">And one line had to separate them from every private equity firm a founder had already met</h4><p>They scale founder-led software through strategy, not just capital. It sets the whole position: the money is the least interesting thing on offer, and what actually comes with it is regional reach, shared systems and operating discipline. The rest of the site is that sentence, proved.</p><h4 class="sh">The brand had to work on two audiences who want opposite reassurances</h4><p>A founder needs to hear that nothing will change. The people funding the buying need to hear that a great deal will change, and quickly. Holding both without either one sounding hollow is the actual design problem, and it is why the operating code, acquisition through integration to growth and scale, is stated as plainly as it is.</p></div><a class="site" href="https://jumptechsolutions.com" target="_blank" rel="noopener">jumptechsolutions.com &nearr;</a><div class="galwrap"><div class="galbar"><span class="gallabel">Gallery</span><span class="galrule"></span><span class="galnav"><button type="button" data-d="-1" aria-label="Previous">&larr;</button><button type="button" data-d="1" aria-label="Next">&rarr;</button></span></div>
+      <div class="gal">
+        <img src="assets/jumptech/hero.jpg" alt="The JumpTech Solutions homepage" loading="lazy">
+        <img src="assets/jumptech/operating-code.jpg" alt="The Operating Code framework: acquisition through integration to growth and scale" loading="lazy">
+        <img src="assets/jumptech/framework.jpg" alt="The partnership model: integration, acceleration, governance" loading="lazy">
+        <img src="assets/jumptech/icons.jpg" alt="The custom mark system built for the brand" loading="lazy">
+      </div></div>
+    </div></div></div></div>
+  </article>
+
+    <div class="chead-bar"><span class="chead-label">Also built</span><span class="chead-rule"></span></div>
+    <div class="crow"><div class="wrap"><span class="clogo"><img src="assets/logos/life-noggin.png" alt="Life Noggin"></span><span class="ctxt"><b>Life Noggin</b> &mdash; audience engagement on a 3.2M subscriber channel</span><span class="ctag">YouTube</span></div></div>
+
+
+
+    <div class="crow"><div class="wrap"><span class="clogo"><img src="assets/logos/marriott.svg" alt="Marriott"></span><span class="ctxt"><b>Marriott</b> &mdash; launching Marriott Hotels across North India</span><span class="ctag">Hospitality</span></div></div>
+
+
+
+    <div class="crow"><div class="wrap"><span class="clogo"><img src="assets/logos/politicl.png" alt="Politicl"></span><span class="ctxt"><b>Politicl</b> &mdash; Hacker News for politics, grown to 100K on Instagram</span><span class="ctag">Audience</span></div></div>
+
+
+
+    <div class="crow"><div class="wrap"><span class="clogo"><img src="assets/logos/theater.png" alt="Theater"></span><span class="ctxt"><b>Theater</b> &mdash; building stores for fashion brands, then joining one&rsquo;s founding team</span><span class="ctag">Fashion</span></div></div>
+
+
+
+    <div class="crow"><div class="wrap"><span class="clogo"><img src="assets/logos/parkstone-mark.svg" alt="Parkstone"></span><span class="ctxt"><b>Parkstone</b> &mdash; brand and strategy for clients including Stellantis and PORR</span><span class="ctag">Brand</span></div></div>
+
+
+
+    <div class="crow"><div class="wrap"><span class="clogo"><img class="ink" src="assets/logos/lifeplugin.svg" alt="LifePlugin"></span><span class="ctxt"><b>LifePlugin</b> &mdash; running the room at a 250-person growth summit &times; 9</span><span class="ctag">Events</span></div></div>
+
+
+
+    <div class="crow"><div class="wrap"><span class="clogo"><img src="assets/logos/shopify.svg" alt="Shopify"></span><span class="ctxt"><b>Shopify builds</b> &mdash; a production line for fashion-focused e-commerce stores</span><span class="ctag">Ecommerce</span></div></div>
+
+
+
+    <div class="crow"><div class="wrap"><span class="clogo"><img src="assets/logos/advostate.svg" alt="Advostate"></span><span class="ctxt"><b>Advostate</b> &mdash; election campaign management for Indian politicians</span><span class="ctag">Strategy</span></div></div>
+
+
+
+    <div class="crow"><div class="wrap"><span class="clogo"><img src="assets/logos/youtube.svg" alt="YouTube"></span><span class="ctxt"><b>Podcast studios</b> &mdash; built from scratch, for universities and for mystics</span><span class="ctag">Video</span></div></div>
+
+
+
+  <div class="sheet bot"></div>
+</section>
+
+<!-- ================= CLOSE ================= -->
+<section class="close"><div class="wrap">
+  <!-- RESTORED 2026-08-01. It was trimmed to "What have you got?" to fix a bad line
+       break; Sid said the fragment read as incomplete, which it did, because the
+       question had no setup on screen. The break is now controlled by widening
+       .close .line to 22ch so it falls after "build." instead of orphaning a word. -->
+  <p class="line">I like to build. <em>What have you got?</em></p>
+  <a class="cta" href="https://calendly.com/sidkarwal/call" target="_blank" rel="noopener">Schedule a call <span class="ar">&rarr;</span></a>
+</div></section>
+
+<script>
+(function(){
+'use strict';
+var RM = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* ---------- palette: casey, dark to light. locked, no switcher. ---------- */
+var PAL = ['#0A0A0A','#16233A','#2F5FA8','#3E8F5C','#4FC8F0','#EDE9A8'];
+var inkGap = 'rgba(10,10,10,.22)';
+
+/* ---------- canvas raster: low-res cell buffer, drawn with fillRect only ---------- */
+var canvas = document.getElementById('raster');
+var ctx = canvas.getContext('2d');
+var ctxOk = !!ctx;
+
+var COLS = 110, ROWS = 70;
+/* non-uniform pitch: this repeating sequence is what makes some columns
+   read dense and some open, once normalised to fill the width */
+var PITCH_SEQ = [2,3,3,5,2,4];
+var colPitches = [], colX = [], cellH = 0, W = 0, H = 0;
+
+function buildColumns(){
+  colPitches = [];
+  for(var i=0;i<COLS;i++) colPitches.push(PITCH_SEQ[i % PITCH_SEQ.length]);
+  var total = 0; for(var j=0;j<COLS;j++) total += colPitches[j];
+  colX = [0];
+  var acc = 0;
+  for(var k=0;k<COLS;k++){ acc += colPitches[k]/total*W; colX.push(acc); }
+  colX[COLS] = W;
+}
+function resize(){
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W; canvas.height = H;
+  buildColumns();
+  cellH = H/ROWS;
+}
+
+/* sin-hash value noise, 2 octaves. cheap on purpose: this is the whole perf budget. */
+function hash2(x,y){
+  var s = Math.sin(x*12.9898+y*78.233)*43758.5453123;
+  return s-Math.floor(s);
+}
+function vnoise(x,y){
+  var xi=Math.floor(x), yi=Math.floor(y), xf=x-xi, yf=y-yi;
+  var a=hash2(xi,yi), b=hash2(xi+1,yi), c=hash2(xi,yi+1), d=hash2(xi+1,yi+1);
+  var u=xf*xf*(3-2*xf), v=yf*yf*(3-2*yf);
+  return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;
+}
+
+/* pointer, lerped toward the real cursor so the lens drifts rather than snaps */
+var px=0, py=0, ptx=0, pty=0;
+
+/* F(x,y,t) = gradient (mostly x, some y) + noise (2 octaves, drifting) + cursor lens.
+   the gradient itself stays fixed (light on one side, dark on the other, no wrap);
+   the slow horizontal drift lives entirely in the noise sample coordinate below,
+   so the field re-forms over time without a hard seam where a wrapped value would jump. */
+function fieldValue(cx, cy, t){
+  var gx = cx/W, gy = cy/H;
+  var gradient = gx*0.78 + gy*0.22;
+  var nx = gx*11 + t*0.035, ny = gy*7;
+  var n1 = vnoise(nx, ny);
+  var n2 = vnoise(nx*2.3+11.7, ny*2.3+5.2);
+  var noise = ((n1*0.62+n2*0.38)-0.5)*0.5;
+  var dx = cx-px, dy = cy-py;
+  var dist = Math.sqrt(dx*dx+dy*dy);
+  var radius = 0.26*Math.min(W,H);
+  var fall = Math.max(0,1-dist/radius);
+  var cursor = fall*fall*0.34;
+  var F = gradient+noise+cursor;
+  return F<0?0:(F>0.9999?0.9999:F);
+}
+
+var frameCount = 0;
+function draw(t){
+  if(!ctxOk) return;
+  var N = PAL.length, eps = 0.18;
+  for(var c=0;c<COLS;c++){
+    var x0=colX[c], x1=colX[c+1], w=(x1-x0)+1;
+    for(var r=0;r<ROWS;r++){
+      var y0=r*cellH;
+      var cx=(x0+x1)/2, cy=y0+cellH/2;
+      var F = fieldValue(cx,cy,t);
+      var raw = F*N;
+      var base = Math.floor(raw); if(base<0)base=0; if(base>N-1)base=N-1;
+      var frac = raw-base;
+      var level = base;
+      /* edge dither: near a boundary, alternate with the neighbour level using a
+         per-cell hash mixed with row parity. this is the chattering transition column. */
+      if(frac>1-eps && base<N-1){
+        var d=(frac-(1-eps))/eps;
+        var hh=hash2(c*0.37+r*1.7, r*0.53+t*0.05);
+        if((hh+(r%2)*0.5)%1<d) level=base+1;
+      } else if(frac<eps && base>0){
+        var d2=(eps-frac)/eps;
+        var hh2=hash2(c*0.37+r*1.7+3.1, r*0.53+t*0.05+7.3);
+        if((hh2+(r%2)*0.5)%1<d2) level=base-1;
+      }
+      ctx.fillStyle = PAL[level];
+      ctx.fillRect(x0,y0,w,cellH+1);
+    }
+    /* one darker gap on the right edge of every column, so the raster reads at every scale */
+    ctx.fillStyle = inkGap;
+    ctx.fillRect(x1-1,0,1,H);
+  }
+  frameCount++;
+}
+
+var FRAME_MS = 1000/24, lastDraw = 0;
+function loop(now){
+  requestAnimationFrame(loop);
+  if(now-lastDraw<FRAME_MS) return;
+  lastDraw = now;
+  px += (ptx-px)*0.045;
+  py += (pty-py)*0.045;
+  draw(now/1000);
+}
+
+resize();
+px=ptx=W*.5; py=pty=H*.45;
+window.addEventListener('resize',function(){ resize(); if(RM) draw(0); },{passive:true});
+
+/* expose enough to verify from outside without trusting a headless screenshot */
+window.__raster = {
+  ctxOk: ctxOk,
+  frameCount: function(){ return frameCount; },
+  cols: COLS, rows: ROWS,
+  cellCount: COLS*ROWS
+};
+
+/* ---------- pointer ----------
+   the custom cursor ring was dropped 2026-08-01 (Sid). This listener stays because
+   the RASTER still reads the pointer: ptx/pty feed the lens term that bends the
+   quantization bands around the cursor. Removing this kills that too. */
+window.addEventListener('mousemove',function(e){
+  ptx=e.clientX; pty=e.clientY;
+},{passive:true});
+
+/* ---------- headline overflow guard ----------
+   the CSS size above is the intended size. this only shrinks the line if it would
+   run past the column, which the nowrap headline would otherwise do silently. */
+var h1=document.querySelector('h1'), h1i=h1.querySelector('.mask i');
+function fitH1(){
+  if(!h1i) return;
+  h1.style.fontSize='';
+  var base=parseFloat(getComputedStyle(h1).fontSize);
+  var r=document.createRange(); r.selectNodeContents(h1i);
+  var natural=r.getBoundingClientRect().width;
+  var par=h1.parentElement, cs=getComputedStyle(par);
+  var avail=par.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  if(natural>avail&&natural>0&&avail>0) h1.style.fontSize=(base*(avail/natural)).toFixed(2)+'px';
+}
+window.fitH1=fitH1;
+fitH1();
+window.addEventListener('resize',fitH1,{passive:true});
+/* the webfont lands after first paint, and it changes the measurement */
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitH1);
+if(document.fonts&&document.fonts.load) document.fonts.load('700 100px "JetBrains Mono"').then(fitH1).catch(function(){});
+setTimeout(fitH1,120);
+
+/* ---------- accordion ---------- */
+/* grid-template-rows 0fr to 1fr animates without measuring heights */
+document.querySelectorAll('.row').forEach(function(row){
+  var head=row.querySelector('.head');
+  head.setAttribute('aria-expanded','false');
+  head.addEventListener('click',function(){
+    var open=row.classList.toggle('open');
+    head.setAttribute('aria-expanded', open ? 'true' : 'false');
+    /* the film starts the moment the row opens, and is destroyed when it closes
+       so it cannot keep playing inside a collapsed panel.
+       MUTED IS NOT OPTIONAL: every browser blocks autoplay with sound, and a
+       blocked video does not play at all, which is worse than a still frame.
+       The viewer unmutes from YouTube's own control. */
+    var v=row.querySelector('.vid[data-yt]');
+    if(!v) return;
+    if(open){
+      var id=v.dataset.yt;
+      var f=document.createElement('iframe');
+      /* controls=0 is what removes YouTube's hover overlay, the channel avatar
+         and the video title. there is no parameter that hides those with the
+         control bar left on. cc_load_policy=0 kills captions, iv_load_policy=3
+         kills annotations, and loop needs playlist set to the same id or it
+         plays once and lands on an end screen we cannot style. */
+      f.src='https://www.youtube-nocookie.com/embed/'+id+
+            '?autoplay=1&mute=1&controls=0&loop=1&playlist='+id+
+            '&playsinline=1&rel=0&modestbranding=1&cc_load_policy=0&iv_load_policy=3'+
+            '&disablekb=1&enablejsapi=1';
+      f.title='Film';
+      f.allow='autoplay; accelerometer; encrypted-media; picture-in-picture';
+      f.setAttribute('allowfullscreen','');
+      v.appendChild(f);
+      /* controls=0 takes the unmute button with it, so we post our own command
+         to the player. autoplay only ever starts muted, in every browser. */
+      var b=document.createElement('button');
+      b.className='snd'; b.type='button'; b.textContent='Sound';
+      b.addEventListener('click',function(e){
+        e.stopPropagation();
+        var on=b.classList.toggle('on');
+        b.textContent = on ? 'Mute' : 'Sound';
+        try{
+          f.contentWindow.postMessage(JSON.stringify(
+            {event:'command',func:on?'unMute':'mute',args:''}),'*');
+        }catch(err){}
+      });
+      v.appendChild(b);
+    } else {
+      v.innerHTML='';
+    }
+  });
+});
+
+/* ---------- reveal, played once ---------- */
+if(RM){ document.body.classList.add('go'); draw(0); }
+else{
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.body.classList.add('go'); }); });
+  requestAnimationFrame(loop);
+}
+})();
+</script>
+
+<script>
+(function(){
+document.querySelectorAll('.galwrap').forEach(function(w){
+  var gal=w.querySelector('.gal'), nav=w.querySelectorAll('.galnav button');
+  if(!gal) return;
+  function step(d){
+    var imgs=[].slice.call(gal.querySelectorAll('img')), l=gal.scrollLeft, best=0, m=1e9;
+    imgs.forEach(function(im,i){var x=Math.abs(im.offsetLeft-imgs[0].offsetLeft-l); if(x<m){m=x;best=i;}});
+    var i=Math.max(0,Math.min(imgs.length-1,best+d));
+    gal.scrollTo({left:imgs[i].offsetLeft-imgs[0].offsetLeft,behavior:'smooth'});
+  }
+  function sync(){
+    var max=gal.scrollWidth-gal.clientWidth;
+    if(nav.length){nav[0].disabled=gal.scrollLeft<=2; nav[1].disabled=gal.scrollLeft>=max-2;}
+  }
+  nav.forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();step(+b.dataset.d);});});
+  gal.addEventListener('scroll',sync,{passive:true});
+  var down=false,sx=0,sl=0;
+  gal.addEventListener('pointerdown',function(e){
+    if(e.pointerType==='touch')return;
+    down=true;sx=e.clientX;sl=gal.scrollLeft;gal.classList.add('drag');
+  });
+  window.addEventListener('pointermove',function(e){ if(down) gal.scrollLeft=sl-(e.clientX-sx); });
+  window.addEventListener('pointerup',function(){ down=false;gal.classList.remove('drag'); });
+  sync();
+});
+document.querySelectorAll('.film').forEach(function(film){
+  film.addEventListener('click',function(){
+    if(film.querySelector('iframe'))return;
+    var f=document.createElement('iframe');
+    /* MUTED IS NOT OPTIONAL. Every browser blocks unmuted autoplay; the player then
+       dies and YouTube shows its "Watch on YouTube" fallback, which is what Sid hit.
+       controls=1 is left on so the viewer unmutes with YouTube's own button. */
+    f.src='https://www.youtube.com/embed/'+film.dataset.yt+'?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1';
+    f.allow='autoplay; encrypted-media; picture-in-picture';
+    f.setAttribute('allowfullscreen','');
+    film.appendChild(f);
+  });
+});
+})();
+</script>
+</body>
+</html>
